@@ -1,0 +1,746 @@
+/* ==========================================================================
+   1. GLOBAL RESETS & BASE STYLES
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+    --primary-color: #0f172a;
+    --primary-accent: #2563eb;
+    --secondary-accent: #3b82f6;
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --sidebar-width: 260px;
+    --topbar-height: 70px;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Helper Utilities */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: var(--text-muted); }
+.text-blue { color: var(--primary-accent); }
+.text-purple { color: #8b5cf6; }
+.text-red { color: var(--danger-color); }
+.text-green { color: var(--success-color); }
+
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mb-12 { margin-bottom: 12px; }
+.flex-1 { flex: 1; }
+.hidden { display: none !important; }
+
+/* ==========================================================================
+   2. APP LAYOUT & SIDEBAR
+   ========================================================================== */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--primary-color);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sidebar-brand {
+    padding: 20px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-logo-img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    border-radius: 6px;
+    background-color: #ffffff;
+    padding: 2px;
+}
+
+.brand-text h3 {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.brand-text span {
+    font-size: 10px;
+    color: #94a3b8;
+    display: block;
+}
+
+.sidebar-menu {
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover, .menu-item.active {
+    background-color: var(--primary-accent);
+    color: #ffffff;
+}
+
+.sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.developer-info {
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.dev-title {
+    color: #94a3b8;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.dev-phone {
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. MAIN VIEWPORT & TOPBAR
+   ========================================================================== */
+.main-viewport {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 24px;
+    width: calc(100% - var(--sidebar-width));
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    background-color: var(--card-bg);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.topbar-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.status-indicator {
+    font-size: 12px;
+    color: var(--success-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    background-color: var(--success-color);
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.kpi-banner {
+    display: flex;
+    gap: 16px;
+}
+
+.kpi-card {
+    background: #f8fafc;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.kpi-icon {
+    font-size: 20px;
+}
+
+.kpi-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.kpi-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   4. WORKSPACE GRID & PANELS
+   ========================================================================== */
+.workspace-grid {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px;
+}
+
+.panel-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Form Controls */
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
+}
+
+.label-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: var(--primary-accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    border-color: var(--primary-accent);
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.grid-span-2 {
+    grid-column: span 2;
+}
+
+.mode-pills {
+    display: flex;
+    background-color: #f1f5f9;
+    padding: 3px;
+    border-radius: 6px;
+}
+
+.pill {
+    border: none;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.pill.active {
+    background-color: #ffffff;
+    color: var(--primary-accent);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.balance-card {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.section-divider {
+    position: relative;
+    text-align: center;
+    margin: 20px 0 16px;
+}
+
+.section-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+.section-divider span {
+    position: relative;
+    background-color: #ffffff;
+    padding: 0 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   5. BUTTONS & ACTIONS
+   ========================================================================== */
+.btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-block { width: 100%; }
+.btn-lg { padding: 12px 20px; font-size: 14px; }
+
+.btn-primary { background-color: var(--primary-accent); color: #ffffff; }
+.btn-primary:hover { background-color: #1d4ed8; }
+
+.btn-secondary { background-color: #f1f5f9; color: var(--text-main); border: 1px solid var(--border-color); }
+.btn-secondary:hover { background-color: #e2e8f0; }
+
+.btn-success { background-color: var(--success-color); color: #ffffff; }
+.btn-success:hover { background-color: #059669; }
+
+.btn-warning { background-color: var(--warning-color); color: #ffffff; }
+.btn-warning:hover { background-color: #d97706; }
+
+.btn-logout { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; width: 100%; }
+.btn-logout:hover { background-color: var(--danger-color); color: #ffffff; }
+
+/* Red Delete Button */
+.btn-delete {
+    background-color: var(--danger-color);
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-delete:hover {
+    background-color: var(--danger-hover);
+}
+
+/* ==========================================================================
+   6. LIVE INVOICE PREVIEW AREA
+   ========================================================================== */
+.invoice-workspace {
+    padding: 20px;
+    background-color: #f1f5f9;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.invoice-paper {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.invoice-header-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: 16px;
+}
+
+.invoice-company-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.invoice-print-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+.company-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.company-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.company-contact {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-accent);
+    margin-top: 2px;
+}
+
+.badge-inv-type {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.customer-info-strip {
+    background-color: #f8fafc;
+    border: 1px dashed var(--border-color);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.modal-table-height {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th, .data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-align: left;
+}
+
+/* Summary Breakdown */
+.invoice-footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.summary-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sum-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.sum-line strong {
+    color: var(--text-main);
+}
+
+.highlight-line {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-accent);
+}
+
+.net-total-line {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--success-color);
+    border-top: 2px solid var(--border-color);
+    padding-top: 6px;
+    margin-top: 4px;
+}
+
+.invoice-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   7. MODALS & POPUPS
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.modal-overlay.modal-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-sm { width: 400px; }
+.modal-lg { width: 800px; }
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.close-icon {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.auth-card { width: 360px; text-align: center; }
+.auth-brand-logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; }
+.alert-text { color: var(--danger-color); font-size: 12px; margin-top: 8px; display: none; }
+
+/* Tabs for ERP Modal */
+.tab-bar {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.tab-btn.active {
+    border-bottom-color: var(--primary-accent);
+    color: var(--primary-accent);
+}
+
+.expense-total-banner {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.print-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.btn-option {
+    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+    padding: 16px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.btn-option.active {
+    border-color: var(--primary-accent);
+    background-color: #eff6ff;
+    color: var(--primary-accent);
+}
+
+/* ==========================================================================
+   8. PRINT MEDIA QUERIES (PAPER STYLES)
+   ========================================================================== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .no-print, .sidebar, .topbar, .modal-overlay, .invoice-toolbar, .card-header {
+        display: none !important;
+    }
+
+    #printableInvoiceCard, #printableInvoiceCard * {
+        visibility: visible;
+    }
+
+    #printableInvoiceCard {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    /* Print Formats */
+    .print-format-Thermal {
+        width: 80mm !important;
+        font-size: 10px !important;
+    }
+    
+    .print-format-Thermal .invoice-print-logo {
+        width: 40px !important;
+        height: 40px !important;
+    }
+}

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PP PRINTER AND ADVERTISIMENT COMPANY - Inventory & Billing System</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Pakistan Banks Auto-Complete Datalist -->
+    <datalist id="pakistanBanksList">
+        <option value="Meezan Bank"></option>
+        <option value="Habib Bank Limited (HBL)"></option>
+        <option value="United Bank Limited (UBL)"></option>
+        <option value="MCB Bank"></option>
+        <option value="Bank Alfalah"></option>
+        <option value="National Bank of Pakistan (NBP)"></option>
+        <option value="Allied Bank Limited (ABL)"></option>
+        <option value="Bank Al Habib"></option>
+        <option value="Faysal Bank"></option>
+        <option value="Askari Bank"></option>
+        <option value="Standard Chartered Bank"></option>
+        <option value="JS Bank"></option>
+        <option value="Dubai Islamic Bank"></option>
+        <option value="Soneri Bank"></option>
+        <option value="Bank of Punjab (BOP)"></option>
+        <option value="Easypaisa / Telenor Bank"></option>
+        <option value="JazzCash / Mobilink Bank"></option>
+        <option value="SadaPay / Nayapay"></option>
+    </datalist>
+
+    <!-- Admin Authentication Modal Overlay -->
+    <div id="adminLoginModal" class="modal-overlay modal-active" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+        <div class="modal-card auth-card">
+            <div class="auth-header">
+                <img src="logo.png.jpg" onerror="this.onerror=null; this.src='logo.jpg';" alt="PP Logo" class="auth-brand-logo">
+                <h3 id="adminTitle">System Locked</h3>
+                <p class="text-muted">Enter Admin PIN/Password to access (Default: 1234)</p>
+            </div>
+            <form id="adminLoginForm" onsubmit="event.preventDefault(); verifyAdminLogin();">
+                <div class="form-group">
+                    <input type="password" id="adminPasswordInput" class="form-input text-center" placeholder="Enter Admin Password" autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Unlock System</button>
+                <div id="adminLoginError" class="alert-text">Invalid Password! Try again.</div>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="logo.png.jpg" onerror="this.onerror=null; this.src='logo.jpg';" alt="PP Logo" class="brand-logo-img">
+                <div class="brand-text">
+                    <h3>PP PRINTER</h3>
+                    <span>INVENTORY & BILLING SYSTEM</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active"><i class="fa-solid fa-calculator" aria-hidden="true"></i> <span>Billing Workspace</span></a>
+                <a href="#" class="menu-item" onclick="openCustomerMasterModal()"><i class="fa-solid fa-users" aria-hidden="true"></i> <span>Customers</span></a>
+                <a href="#" class="menu-item" onclick="openExpenseModal()"><i class="fa-solid fa-wallet" aria-hidden="true"></i> <span>Expenses</span></a>
+                <a href="#" class="menu-item" onclick="openBankAccountsModal()"><i class="fa-solid fa-building-columns" aria-hidden="true"></i> <span>Bank Accounts</span></a>
+                <a href="#" class="menu-item" onclick="openKhataPaymentModal()"><i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i> <span>Khata Payments</span></a>
+                <a href="#" class="menu-item" onclick="openExcelSheetView()"><i class="fa-solid fa-file-excel" aria-hidden="true"></i> <span>Reports & Sheets</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="developer-info">
+                    <div class="dev-title">Contact & Support</div>
+                    <div class="dev-phone"><i class="fa-solid fa-phone"></i> 0322-2722844</div>
+                    <div class="dev-phone"><i class="fa-solid fa-phone"></i> 0321-2100678</div>
+                </div>
+                <button class="btn btn-logout" onclick="lockAdminSession()"><i class="fa-solid fa-lock" aria-hidden="true"></i> Lock System</button>
+            </div>
+        </aside>
+
+        <!-- Main Viewport -->
+        <main class="main-viewport">
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="topbar-title">
+                    <h1 id="pageTitle">Sales & Billing Management</h1>
+                    <div class="status-indicator"><span class="pulse"></span> System Operational</div>
+                </div>
+
+                <div class="kpi-banner">
+                    <div class="kpi-card">
+                        <div class="kpi-icon text-blue"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
+                        <div>
+                            <div class="kpi-label">Total Sales</div>
+                            <h4 id="dashTotalSales">0.00 PKR</h4>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon text-purple"><i class="fa-solid fa-vault" aria-hidden="true"></i></div>
+                        <div>
+                            <div class="kpi-label">Bank Balance</div>
+                            <h4 id="dashTotalBank">0.00 PKR</h4>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon text-red"><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i></div>
+                        <div>
+                            <div class="kpi-label">Expenses</div>
+                            <h4 id="dashTotalExpenses">0.00 PKR</h4>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon text-green"><i class="fa-solid fa-scale-balanced" aria-hidden="true"></i></div>
+                        <div>
+                            <div class="kpi-label">Receivables</div>
+                            <h4 id="dashTotalReceivables">0.00 PKR</h4>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Workspace Grid -->
+            <div class="workspace-grid">
+                <!-- Left Entry Panel -->
+                <section class="panel-card">
+                    <div class="card-header">
+                        <h3>Billing Input Controls</h3>
+                        <div class="mode-pills">
+                            <button id="pillSales" class="pill active" onclick="switchBillingMode('Sales')">Sales</button>
+                            <button id="pillPurchase" class="pill" onclick="switchBillingMode('Purchase')">Purchase</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form onsubmit="event.preventDefault();">
+                            <div class="form-group">
+                                <div class="label-with-action">
+                                    <label id="lblPartySelect" for="billCustSelect">Customer Account Profile</label>
+                                    <button type="button" class="link-btn" onclick="openCustomerMasterModal()">+ New Profile</button>
+                                </div>
+                                <select id="billCustSelect" class="form-input" onchange="onCustomerSelectChange()"></select>
+                            </div>
+
+                            <div class="balance-card">
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i> Current Balance: <strong id="selectedCustBalanceText">0.00 PKR</strong>
+                            </div>
+
+                            <div class="section-divider"><span>ITEM SELECTION</span></div>
+
+                            <div class="form-group">
+                                <label for="billItemSelect">Select Product / Item</label>
+                                <select id="billItemSelect" class="form-input" onchange="autoFillRate()"></select>
+                            </div>
+
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <label for="billRate">Unit Rate (PKR)</label>
+                                    <input type="number" id="billRate" class="form-input" placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="billQty">Quantity</label>
+                                    <input type="number" id="billQty" class="form-input" value="1" min="1">
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-block mt-8" onclick="addItemToCurrentInvoice()">
+                                <i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Add Item to Invoice
+                            </button>
+                        </form>
+
+                        <div class="section-divider"><span>INVENTORY & STOCK QUICK ADD</span></div>
+                        <form onsubmit="event.preventDefault(); addProduct();">
+                            <div class="input-grid">
+                                <div class="form-group">
+                                    <input type="text" id="itemName" class="form-input" placeholder="Item Name">
+                                </div>
+                                <div class="form-group">
+                                    <select id="itemCatSelect" class="form-input"></select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="itemBarcode" class="form-input" placeholder="Barcode / SKU">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="itemRate" class="form-input" placeholder="Rate">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-secondary btn-block mt-8"><i class="fa-solid fa-box" aria-hidden="true"></i> Save Stock Product</button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Right Invoice Preview Panel -->
+                <section class="panel-card" id="invoicePreviewArea">
+                    <div class="card-header no-print">
+                        <h3>Live Invoice Preview</h3>
+                        <button class="btn btn-secondary" onclick="openPrintFormatModal()"><i class="fa-solid fa-print" aria-hidden="true"></i> Print Invoice</button>
+                    </div>
+                    <div class="invoice-workspace">
+                        <div class="invoice-paper print-format-A4" id="printableInvoiceCard">
+                            <!-- Invoice Printed Header with Logo & Phone Numbers -->
+                            <div class="invoice-header-block">
+                                <div class="invoice-company-brand">
+                                    <img src="logo.png.jpg" onerror="this.onerror=null; this.src='logo.jpg';" alt="PP Printer Logo" class="invoice-print-logo">
+                                    <div>
+                                        <div class="company-title">PP PRINTER AND ADVERTISIMENT COMPANY</div>
+                                        <div class="company-sub">Inventory & Billing System</div>
+                                        <div class="company-contact"><i class="fa-solid fa-phone"></i> 0322-2722844 / 0321-2100678</div>
+                                    </div>
+                                </div>
+                                <div class="invoice-meta">
+                                    <span id="invTypeBadge" class="badge-inv-type">SALES INVOICE</span>
+                                    <h3 id="invNumber">INV-000001</h3>
+                                    <div id="invDate" class="company-sub">Date: --/--/----</div>
+                                </div>
+                            </div>
+
+                            <div class="customer-info-strip" id="invCustomerInfo">
+                                Billed To: Cash Customer
+                            </div>
+
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Item Description</th>
+                                            <th scope="col" class="text-right">Rate</th>
+                                            <th scope="col" class="text-center">Qty</th>
+                                            <th scope="col" class="text-right">Amount</th>
+                                            <th scope="col" class="text-center no-print">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoiceItemsTable">
+                                        <!-- Dynamic Invoice Rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="invoice-footer-grid">
+                                <div class="discount-tax-inputs no-print">
+                                    <div class="form-group">
+                                        <label for="invoiceDiscountVal">Discount</label>
+                                        <input type="number" id="invoiceDiscountVal" class="form-input" value="0" oninput="calculateInvoiceSummary()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="invoiceDiscountType">Type</label>
+                                        <select id="invoiceDiscountType" class="form-input" onchange="calculateInvoiceSummary()">
+                                            <option value="PKR">PKR</option>
+                                            <option value="%">%</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="invoiceTaxPercent">Tax Rate (%)</label>
+                                        <input type="number" id="invoiceTaxPercent" class="form-input" value="0" oninput="calculateInvoiceSummary()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="previewReceiveAmount">Amount Received</label>
+                                        <input type="number" id="previewReceiveAmount" class="form-input" value="0" oninput="calculateInvoiceSummary()">
+                                    </div>
+                                    <div class="form-group grid-span-2">
+                                        <label for="invoiceTargetBank">Target Bank Account</label>
+                                        <select id="invoiceTargetBank" class="form-input"></select>
+                                    </div>
+                                </div>
+
+                                <div class="summary-breakdown">
+                                    <div class="sum-line"><span>Subtotal:</span> <strong id="summarySubtotal">0.00 PKR</strong></div>
+                                    <div class="sum-line"><span>Discount:</span> <strong id="summaryDiscountAmount">0.00 PKR</strong></div>
+                                    <div class="sum-line"><span>Tax Amount:</span> <strong id="summaryTaxAmount">0.00 PKR</strong></div>
+                                    <div class="sum-line highlight-line"><span>Current Bill:</span> <strong id="summaryCurrentBill">0.00 PKR</strong></div>
+                                    <div class="sum-line"><span>Previous Balance:</span> <strong id="summaryOpeningBalance">0.00 PKR</strong></div>
+                                    <div class="sum-line"><span>Gross Total:</span> <strong id="summaryGrossBalance">0.00 PKR</strong></div>
+                                    <div class="sum-line"><span>Total Received:</span> <strong id="summaryTotalReceived">0.00 PKR</strong></div>
+                                    <div class="sum-line net-total-line"><span>Net Payable:</span> <strong id="summaryNetBalance">0.00 PKR</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="invoice-toolbar no-print">
+                                <button class="btn btn-success flex-1 btn-lg" onclick="finalizeBillAndSave()"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Save & Complete Order</button>
+                                <button class="btn btn-warning" onclick="resetInvoice()"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Customer Master Modal -->
+    <div id="customerMasterModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="custModalTitle">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="custModalTitle"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Customer Account Management</h3>
+                <button class="close-icon" onclick="closeCustomerMasterModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault(); savePopupCustomerProfile();">
+                <div class="input-grid">
+                    <input type="text" id="popupCustName" class="form-input" placeholder="Customer / Business Name" required>
+                    <input type="text" id="popupCustPhone" class="form-input" placeholder="Phone Number">
+                    <input type="number" id="popupCustOpening" class="form-input grid-span-2" placeholder="Opening Balance (PKR)">
+                </div>
+                <button type="submit" class="btn btn-primary mt-8"><i class="fa-solid fa-plus" aria-hidden="true"></i> Save Customer</button>
+            </form>
+            <div class="table-container modal-table-height mt-16">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Customer Name</th>
+                            <th scope="col">Phone</th>
+                            <th scope="col" class="text-right">Balance</th>
+                            <th scope="col" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerMasterPopupTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Accounts Modal -->
+    <div id="bankModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="bankModalTitle">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="bankModalTitle"><i class="fa-solid fa-building-columns" aria-hidden="true"></i> Bank Accounts & Liquidity</h3>
+                <button class="close-icon" onclick="closeBankAccountsModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault(); addNewBankAccount();">
+                <div class="input-grid">
+                    <input type="text" id="bankNameInput" list="pakistanBanksList" class="form-input" placeholder="Select or Type Bank Name..." required>
+                    <input type="text" id="bankTitleInput" class="form-input" placeholder="Account Title" required>
+                    <input type="text" id="bankAccNoInput" class="form-input" placeholder="Account Number / IBAN">
+                    <input type="number" id="bankBalanceInput" class="form-input" placeholder="Opening Balance (PKR)">
+                </div>
+                <button type="submit" class="btn btn-primary mt-8"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Bank Account</button>
+            </form>
+            <div class="table-container modal-table-height mt-16">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Bank</th>
+                            <th scope="col">Account Title</th>
+                            <th scope="col">Account No</th>
+                            <th scope="col" class="text-right">Balance</th>
+                            <th scope="col" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bankAccountsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div id="expenseModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="expenseModalTitle"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Expense Ledger & Management</h3>
+                <button class="close-icon" onclick="closeExpenseModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="expense-total-banner mb-12">
+                <span>Total Shop Expenses Recorded:</span>
+                <strong id="totalExpenseAmountSum">0.00 PKR</strong>
+            </div>
+            <form onsubmit="event.preventDefault(); addNewExpenseRecord();">
+                <div class="input-grid">
+                    <input type="text" id="expenseTitleInput" class="form-input" placeholder="Expense Description" required>
+                    <select id="expenseCategorySelect" class="form-input"></select>
+                    <select id="expenseBankSelect" class="form-input"></select>
+                    <input type="number" id="expenseAmountInput" class="form-input" placeholder="Amount (PKR)" required>
+                </div>
+                <button type="submit" class="btn btn-primary mt-8"><i class="fa-solid fa-minus-circle" aria-hidden="true"></i> Record Expense</button>
+            </form>
+            <div class="table-container modal-table-height mt-16">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Description</th>
+                            <th scope="col" class="text-right">Amount</th>
+                            <th scope="col" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensePopupTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khata Payment Modal -->
+    <div id="khataPaymentModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="khataModalTitle">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h3 id="khataModalTitle"><i class="fa-solid fa-hand-holding-dollar" aria-hidden="true"></i> Receive Customer Payment</h3>
+                <button class="close-icon" onclick="closeKhataPaymentModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault(); saveKhataPaymentReceipt();">
+                <div class="form-group">
+                    <label for="payReceiveCustSelect">Customer</label>
+                    <select id="payReceiveCustSelect" class="form-input"></select>
+                </div>
+                <div class="form-group">
+                    <label for="khataBankSelect">Deposit To Bank</label>
+                    <select id="khataBankSelect" class="form-input"></select>
+                </div>
+                <div class="form-group">
+                    <label for="khataReceiveAmount">Received Amount (PKR)</label>
+                    <input type="number" id="khataReceiveAmount" class="form-input" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-block mt-16"><i class="fa-solid fa-check-circle" aria-hidden="true"></i> Record Payment Received</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Excel Reports Modal -->
+    <div id="excelSheetModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="excelModalTitle">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <h3 id="excelModalTitle"><i class="fa-solid fa-file-excel" aria-hidden="true"></i> ERP Master Ledger & Reports</h3>
+                <button class="close-icon" onclick="closeExcelSheetView()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="tab-bar">
+                <button id="sheetTabSales" class="tab-btn active" onclick="switchExcelSheet('Sales')">Sales Invoices</button>
+                <button id="sheetTabPurchase" class="tab-btn" onclick="switchExcelSheet('Purchase')">Purchase Invoices</button>
+                <button id="sheetTabInventory" class="tab-btn" onclick="switchExcelSheet('Inventory')">Inventory Stock</button>
+                <button id="sheetTabExpenses" class="tab-btn" onclick="switchExcelSheet('Expenses')">Expense Records</button>
+            </div>
+            <div class="table-container modal-table-height">
+                <table class="data-table">
+                    <thead>
+                        <tr id="excelSheetHeaderRow"></tr>
+                    </thead>
+                    <tbody id="excelSheetBodyRows"></tbody>
+                </table>
+            </div>
+            <button class="btn btn-success mt-16" onclick="exportActiveExcelSheet()"><i class="fa-solid fa-download" aria-hidden="true"></i> Export to Excel File (.xlsx)</button>
+        </div>
+    </div>
+
+    <!-- Print Setup Modal -->
+    <div id="printFormatModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="printModalTitle">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h3 id="printModalTitle"><i class="fa-solid fa-print" aria-hidden="true"></i> Select Print Format</h3>
+                <button class="close-icon" onclick="closePrintFormatModal()" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="print-options-grid">
+                <button id="btnFormatA4" class="btn-option active" onclick="selectPrintFormat('A4')">
+                    <i class="fa-solid fa-file" aria-hidden="true"></i> A4 Standard
+                </button>
+                <button id="btnFormatHalfA4" class="btn-option" onclick="selectPrintFormat('HalfA4')">
+                    <i class="fa-solid fa-file-lines" aria-hidden="true"></i> A5 / Half A4
+                </button>
+                <button id="btnFormatThermal" class="btn-option" onclick="selectPrintFormat('Thermal')">
+                    <i class="fa-solid fa-receipt" aria-hidden="true"></i> 80mm Thermal
+                </button>
+            </div>
+            <button class="btn btn-primary btn-block mt-20" onclick="executePrintOrPdfAction()"><i class="fa-solid fa-print" aria-hidden="true"></i> Proceed to Print</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
